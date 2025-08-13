@@ -8,6 +8,7 @@ export default function RootLayout() {
             <Stack
                 screenOptions={{
                     headerShown: false,
+                    // gestureEnabled: false, // 🚫 disables swipe back globally
                 }}
             >
                 <Stack.Screen name="index" />
