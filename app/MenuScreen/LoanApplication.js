@@ -82,6 +82,7 @@ export default function CreditDemandCardView() {
 
 function StatusList({ status, searchQuery }) {
     const [data, setData] = useState([]);
+    const [fullData, setFullData] = useState([]); // Store full filtered data for pagination
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -111,15 +112,15 @@ function StatusList({ status, searchQuery }) {
         return columns.indexOf(column);
     };
 
-    const fetchData = (page = 1) => {
+    const fetchData = () => {
         setLoading(true);
         const payload = {
             sEcho: 1,
             iColumns: 17,
             sColumns:
                 ',row_no,effective_date,branch_name,introducer,id_no,identification,ac_no,field_officer,purpose,account_type,is_fd_loan,fd_cr_percent,fd_add_percent,demand_amt,request_days,request_date',
-            iDisplayStart: (page - 1) * recordsPerPage,
-            iDisplayLength: recordsPerPage,
+            iDisplayStart: 0, // Fetch all data
+            iDisplayLength: 1000, // Large number to get all records (adjust based on API limits)
             mDataProp_0: 'function',
             sSearch_0: '',
             bRegex_0: false,
@@ -205,10 +206,7 @@ function StatusList({ status, searchQuery }) {
             bRegex_16: false,
             bSearchable_16: true,
             bSortable_16: true,
-            sSearch:
-                status === 'All'
-                    ? searchQuery
-                    : `${status} ${searchQuery}`.trim(),
+            sSearch: searchQuery,
             bRegex: false,
             iSortCol_0: getColumnIndex('row_no'),
             sSortDir_0: 'asc',
@@ -221,8 +219,22 @@ function StatusList({ status, searchQuery }) {
                 payload
             )
             .then((res) => {
-                setData(res.data.aaData || []);
-                setTotalRecords(res.data.iTotalRecords || 0);
+                let filteredData = res.data.aaData || [];
+                if (status !== 'All') {
+                    filteredData = filteredData.filter((item) => {
+                        if (status === 'Rejected')
+                            return item.auth_value === -1;
+                        if (status === 'Approved') return item.auth_value === 1;
+                        if (status === 'Pending')
+                            return (
+                                item.auth_value === 0 || item.auth_value == null
+                            );
+                        return true;
+                    });
+                }
+                setFullData(filteredData); // Store full filtered data
+                setTotalRecords(filteredData.length);
+                setData(filteredData.slice(0, recordsPerPage)); // Initial page
             })
             .catch((err) => {
                 console.error('Axios fetch error:', err.message);
@@ -233,7 +245,7 @@ function StatusList({ status, searchQuery }) {
 
     useEffect(() => {
         setCurrentPage(1); // Reset to page 1 on search or status change
-        fetchData(1);
+        fetchData();
     }, [searchQuery, status]);
 
     const handlePageChange = (newPage) => {
@@ -242,14 +254,16 @@ function StatusList({ status, searchQuery }) {
             newPage <= Math.ceil(totalRecords / recordsPerPage)
         ) {
             setCurrentPage(newPage);
-            fetchData(newPage);
+            const startIndex = (newPage - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            setData(fullData.slice(startIndex, endIndex));
         }
     };
 
     const renderCard = ({ item }) => (
         <TouchableOpacity
             style={styles.card}
-            activeOpacity={0.7} // makes the touch feedback nicer
+            activeOpacity={0.7}
             onPress={() =>
                 Alert.alert(
                     'Pressed: ' + item.id_no + ' - ' + item.identification
@@ -284,6 +298,14 @@ function StatusList({ status, searchQuery }) {
                 <Text style={styles.cardText}>
                     <Text style={styles.label}>Request Date: </Text>
                     {item.request_date}
+                </Text>
+                <Text style={styles.cardText}>
+                    <Text style={styles.label}>Status: </Text>
+                    {item.auth_value === -1
+                        ? 'Rejected'
+                        : item.auth_value === 1
+                        ? 'Approved'
+                        : 'Pending'}
                 </Text>
             </View>
         </TouchableOpacity>
@@ -322,10 +344,11 @@ function StatusList({ status, searchQuery }) {
             />
             <View style={styles.pagination}>
                 <TouchableOpacity
-                    style={[
-                        styles.pageButton,
-                        currentPage === 1 && styles.disabledButton,
-                    ]}
+                    style={
+                        currentPage === 1
+                            ? [styles.pageButton, styles.disabledButton]
+                            : styles.pageButton
+                    }
                     onPress={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                 >
@@ -336,12 +359,11 @@ function StatusList({ status, searchQuery }) {
                     {Math.ceil(totalRecords / recordsPerPage)}
                 </Text>
                 <TouchableOpacity
-                    style={[
-                        styles.pageButton,
-                        currentPage ===
-                            Math.ceil(totalRecords / recordsPerPage) &&
-                            styles.disabledButton,
-                    ]}
+                    style={
+                        currentPage === Math.ceil(totalRecords / recordsPerPage)
+                            ? [styles.pageButton, styles.disabledButton]
+                            : styles.pageButton
+                    }
                     onPress={() => handlePageChange(currentPage + 1)}
                     disabled={
                         currentPage === Math.ceil(totalRecords / recordsPerPage)
@@ -418,17 +440,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 4,
-    },
-    cardHeader: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        paddingBottom: 8,
-        marginBottom: 8,
-    },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
     },
     cardContent: {
         flexDirection: 'column',
