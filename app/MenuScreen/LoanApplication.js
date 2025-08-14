@@ -5,6 +5,7 @@ import {
     Alert,
     Dimensions,
     FlatList,
+    RefreshControl,
     StyleSheet,
     Text,
     TextInput,
@@ -82,11 +83,12 @@ export default function CreditDemandCardView() {
 
 function StatusList({ status, searchQuery }) {
     const [data, setData] = useState([]);
-    const [fullData, setFullData] = useState([]); // Store full filtered data for pagination
+    const [fullData, setFullData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
+    const [refreshing, setRefreshing] = useState(false); // New state for refresh control
     const recordsPerPage = 5;
 
     const getColumnIndex = (column) => {
@@ -114,13 +116,14 @@ function StatusList({ status, searchQuery }) {
 
     const fetchData = () => {
         setLoading(true);
+        setRefreshing(true); // Show refresh indicator
         const payload = {
             sEcho: 1,
             iColumns: 17,
             sColumns:
                 ',row_no,effective_date,branch_name,introducer,id_no,identification,ac_no,field_officer,purpose,account_type,is_fd_loan,fd_cr_percent,fd_add_percent,demand_amt,request_days,request_date',
-            iDisplayStart: 0, // Fetch all data
-            iDisplayLength: 1000, // Large number to get all records (adjust based on API limits)
+            iDisplayStart: 0,
+            iDisplayLength: 1000,
             mDataProp_0: 'function',
             sSearch_0: '',
             bRegex_0: false,
@@ -232,19 +235,22 @@ function StatusList({ status, searchQuery }) {
                         return true;
                     });
                 }
-                setFullData(filteredData); // Store full filtered data
+                setFullData(filteredData);
                 setTotalRecords(filteredData.length);
-                setData(filteredData.slice(0, recordsPerPage)); // Initial page
+                setData(filteredData.slice(0, recordsPerPage));
             })
             .catch((err) => {
                 console.error('Axios fetch error:', err.message);
                 setError(err.message || 'Unknown error');
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+                setRefreshing(false); // Hide refresh indicator
+            });
     };
 
     useEffect(() => {
-        setCurrentPage(1); // Reset to page 1 on search or status change
+        setCurrentPage(1);
         fetchData();
     }, [searchQuery, status]);
 
@@ -258,6 +264,12 @@ function StatusList({ status, searchQuery }) {
             const endIndex = startIndex + recordsPerPage;
             setData(fullData.slice(startIndex, endIndex));
         }
+    };
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        setCurrentPage(1); // Reset to first page
+        fetchData(); // Trigger data fetch
     };
 
     const renderCard = ({ item }) => (
@@ -341,6 +353,14 @@ function StatusList({ status, searchQuery }) {
                 }
                 renderItem={renderCard}
                 contentContainerStyle={styles.flatListContent}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#007AFF']} // Spinner color
+                        tintColor="#007AFF" // iOS spinner color
+                    />
+                }
             />
             <View style={styles.pagination}>
                 <TouchableOpacity
