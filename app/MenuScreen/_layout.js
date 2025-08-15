@@ -6,15 +6,18 @@ import {
     DrawerItemList,
 } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import DailyReport from './DailyReport';
 import Dashboard from './Dashboard';
+import Details from './Details'; // your details screen
 import FinancialReport from './FinancialReport';
 import LoanApplication from './LoanApplication';
 import Support from './Support';
 
 const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
 
 function CustomDrawerContent(props) {
     const navigation = useNavigation();
@@ -29,17 +32,15 @@ function CustomDrawerContent(props) {
             }}
         >
             <View>
-                {/* Normal drawer items with borders */}
                 <DrawerItemList {...props} />
             </View>
 
-            {/* Sign Out Button Section */}
             <View style={styles.signOutContainer}>
                 <View style={styles.separator} />
                 <DrawerItem
                     label="Sign Out"
                     labelStyle={{ fontWeight: 'bold', color: '#d32f2f' }}
-                    icon={({ color, size }) => (
+                    icon={({ size }) => (
                         <MaterialIcons
                             name="logout"
                             color="#d32f2f"
@@ -53,7 +54,8 @@ function CustomDrawerContent(props) {
     );
 }
 
-export default function MenuScreenLayout() {
+// Drawer with only main menu items
+function DrawerScreens() {
     return (
         <Drawer.Navigator
             drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -83,7 +85,6 @@ export default function MenuScreenLayout() {
                     ),
                 }}
             />
-
             <Drawer.Screen
                 name="Loan Application"
                 component={LoanApplication}
@@ -125,7 +126,6 @@ export default function MenuScreenLayout() {
                     ),
                 })}
             />
-
             <Drawer.Screen
                 name="Daily Report"
                 component={DailyReport}
@@ -163,7 +163,6 @@ export default function MenuScreenLayout() {
                     ),
                 })}
             />
-
             <Drawer.Screen
                 name="Financial Report"
                 component={FinancialReport}
@@ -205,7 +204,6 @@ export default function MenuScreenLayout() {
                     ),
                 })}
             />
-
             <Drawer.Screen
                 name="Support"
                 component={Support}
@@ -248,6 +246,20 @@ export default function MenuScreenLayout() {
                 })}
             />
         </Drawer.Navigator>
+    );
+}
+
+// Stack wraps drawer + details
+export default function MenuScreenLayout() {
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="MainDrawer" component={DrawerScreens} />
+            <Stack.Screen
+                name="Details"
+                component={Details}
+                options={{ headerShown: true, title: 'Details' }}
+            />
+        </Stack.Navigator>
     );
 }
 
