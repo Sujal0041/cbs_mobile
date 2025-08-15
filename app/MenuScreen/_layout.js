@@ -65,7 +65,7 @@ function DrawerScreens() {
                 drawerInactiveTintColor: '#333',
                 drawerLabelStyle: { fontSize: 16, marginLeft: -10 },
                 drawerStyle: {
-                    width: 280,
+                    width: 294,
                     backgroundColor: '#fff',
                     borderRightWidth: 1,
                     borderRightColor: '#ddd',

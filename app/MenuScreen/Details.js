@@ -121,20 +121,6 @@ const Details = () => {
                         </View>
                     ))}
                 </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={[styles.button, styles.approveButton]}
-                        onPress={handleApprove}
-                    >
-                        <Text style={styles.buttonText}>Approve</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.button, styles.rejectButton]}
-                        onPress={handleReject}
-                    >
-                        <Text style={styles.buttonText}>Reject</Text>
-                    </TouchableOpacity>
-                </View>
                 <View style={styles.textAreaContainer}>
                     <Text style={styles.textAreaLabel}>Comments</Text>
                     <View style={styles.inputContainer}>
@@ -175,6 +161,20 @@ const Details = () => {
                             </Text>
                         )}
                     </ScrollView>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={[styles.button, styles.approveButton]}
+                        onPress={handleApprove}
+                    >
+                        <Text style={styles.buttonText}>Approve</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.button, styles.rejectButton]}
+                        onPress={handleReject}
+                    >
+                        <Text style={styles.buttonText}>Reject</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
