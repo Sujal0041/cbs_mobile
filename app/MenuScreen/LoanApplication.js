@@ -1,8 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     Dimensions,
     FlatList,
     RefreshControl,
@@ -88,7 +88,8 @@ function StatusList({ status, searchQuery }) {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [refreshing, setRefreshing] = useState(false); // New state for refresh control
+    const [refreshing, setRefreshing] = useState(false);
+    const navigation = useNavigation();
     const recordsPerPage = 5;
 
     const getColumnIndex = (column) => {
@@ -116,7 +117,7 @@ function StatusList({ status, searchQuery }) {
 
     const fetchData = () => {
         setLoading(true);
-        setRefreshing(true); // Show refresh indicator
+        setRefreshing(true);
         const payload = {
             sEcho: 1,
             iColumns: 17,
@@ -245,7 +246,7 @@ function StatusList({ status, searchQuery }) {
             })
             .finally(() => {
                 setLoading(false);
-                setRefreshing(false); // Hide refresh indicator
+                setRefreshing(false);
             });
     };
 
@@ -268,8 +269,8 @@ function StatusList({ status, searchQuery }) {
 
     const onRefresh = () => {
         setRefreshing(true);
-        setCurrentPage(1); // Reset to first page
-        fetchData(); // Trigger data fetch
+        setCurrentPage(1);
+        fetchData();
     };
 
     const renderCard = ({ item }) => (
@@ -277,9 +278,7 @@ function StatusList({ status, searchQuery }) {
             style={styles.card}
             activeOpacity={0.7}
             onPress={() =>
-                Alert.alert(
-                    'Pressed: ' + item.id_no + ' - ' + item.identification
-                )
+                navigation.navigate('Details', { id: item.id, item })
             }
         >
             <View style={styles.cardContent}>
@@ -357,8 +356,8 @@ function StatusList({ status, searchQuery }) {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        colors={['#007AFF']} // Spinner color
-                        tintColor="#007AFF" // iOS spinner color
+                        colors={['#007AFF']}
+                        tintColor="#007AFF"
                     />
                 }
             />
@@ -400,7 +399,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        marginTop: 40,
+        marginTop: 0,
         backgroundColor: '#f5f5f5',
     },
     title: {

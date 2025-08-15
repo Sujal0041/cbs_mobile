@@ -6,7 +6,8 @@ import {
     DrawerItemList,
 } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import DailyReport from './DailyReport';
 import Dashboard from './Dashboard';
 import FinancialReport from './FinancialReport';
@@ -65,7 +66,7 @@ export default function MenuScreenLayout() {
                     width: 280,
                     backgroundColor: '#fff',
                     borderRightWidth: 1,
-                    borderRightColor: '#ddd', // subtle border
+                    borderRightColor: '#ddd',
                 },
             }}
         >
@@ -82,10 +83,11 @@ export default function MenuScreenLayout() {
                     ),
                 }}
             />
+
             <Drawer.Screen
                 name="Loan Application"
                 component={LoanApplication}
-                options={{
+                options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <MaterialIcons
                             name="description"
@@ -93,21 +95,79 @@ export default function MenuScreenLayout() {
                             size={size}
                         />
                     ),
-                }}
+                    headerLeft: () => (
+                        <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+                            {/* Back Button */}
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.canGoBack() &&
+                                    navigation.goBack()
+                                }
+                                style={{ marginRight: 15 }}
+                            >
+                                <MaterialIcons
+                                    name="arrow-back"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                            {/* Drawer Button */}
+                            <TouchableOpacity
+                                onPress={() => navigation.openDrawer()}
+                            >
+                                <MaterialIcons
+                                    name="menu"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                })}
             />
+
             <Drawer.Screen
                 name="Daily Report"
                 component={DailyReport}
-                options={{
+                options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <MaterialIcons name="today" color={color} size={size} />
                     ),
-                }}
+                    headerLeft: () => (
+                        <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+                            {/* Back Button */}
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.canGoBack() &&
+                                    navigation.goBack()
+                                }
+                                style={{ marginRight: 15 }}
+                            >
+                                <MaterialIcons
+                                    name="arrow-back"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                            {/* Drawer Button */}
+                            <TouchableOpacity
+                                onPress={() => navigation.openDrawer()}
+                            >
+                                <MaterialIcons
+                                    name="menu"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                })}
             />
+
             <Drawer.Screen
                 name="Financial Report"
                 component={FinancialReport}
-                options={{
+                options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <MaterialIcons
                             name="attach-money"
@@ -115,12 +175,41 @@ export default function MenuScreenLayout() {
                             size={size}
                         />
                     ),
-                }}
+                    headerLeft: () => (
+                        <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+                            {/* Back Button */}
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.canGoBack() &&
+                                    navigation.goBack()
+                                }
+                                style={{ marginRight: 15 }}
+                            >
+                                <MaterialIcons
+                                    name="arrow-back"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                            {/* Drawer Button */}
+                            <TouchableOpacity
+                                onPress={() => navigation.openDrawer()}
+                            >
+                                <MaterialIcons
+                                    name="menu"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                })}
             />
+
             <Drawer.Screen
                 name="Support"
                 component={Support}
-                options={{
+                options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <MaterialIcons
                             name="support-agent"
@@ -128,7 +217,35 @@ export default function MenuScreenLayout() {
                             size={size}
                         />
                     ),
-                }}
+                    headerLeft: () => (
+                        <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+                            {/* Back Button */}
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.canGoBack() &&
+                                    navigation.goBack()
+                                }
+                                style={{ marginRight: 15 }}
+                            >
+                                <MaterialIcons
+                                    name="arrow-back"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                            {/* Drawer Button */}
+                            <TouchableOpacity
+                                onPress={() => navigation.openDrawer()}
+                            >
+                                <MaterialIcons
+                                    name="menu"
+                                    size={24}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                })}
             />
         </Drawer.Navigator>
     );
